@@ -68,7 +68,7 @@ const checkLevelAndEnergy = async (userId, level, quantity) => {
   return condition;
 }
 
-const addOrder = (userId, orderId, tx, nftType, nftLevel, nftRarity, tokenId, mintedAt, blockNumber) => {
+const addOrder = async (userId, orderId, tx, nftType, nftLevel, nftRarity, tokenId, mintedAt, blockNumber) => {
   try {
     const newOrder = new Order({
       user_id: userId,
@@ -82,14 +82,14 @@ const addOrder = (userId, orderId, tx, nftType, nftLevel, nftRarity, tokenId, mi
       block_number: blockNumber
     });
   
-    newOrder.save();
+    await newOrder.save();
     return newOrder
   } catch (error) {
     throw error;
   }
 }
 
-const updateEnergy = async (nftType, nftLevel, nftRarity, quantity, data, userId) => {
+const updateEnergy = async (nftType, nftLevel, nftRarity, quantity, data) => {
   try {
     if (nftType === 'ENERGY') {
       const energyIconAmount = LEVEL_CONDITION[`${nftLevel}`] * quantity;
@@ -100,8 +100,8 @@ const updateEnergy = async (nftType, nftLevel, nftRarity, quantity, data, userId
         steps: data.steps - stepsAmount,
       }
 
-      const updatedEnergy = await Energy.findByIdAndUpdate(userId, { $set: updateData });
-      return updatedEnergy;
+      await Energy.findByIdAndUpdate(data._id, { $set: updateData });
+      return updateData;
     }
   } catch(err) {
     throw err;
@@ -126,8 +126,15 @@ const createMetadata = async (nftLevel, nftRarity, tokenId) => {
       ]
     }
 
-    const path = await fs.writeFileSync(path.join(__dirname, `./public/metadata/${tokenId}.json`), JSON.stringify(metadata));
-    return path;
+    // const pathFile = await fs.writeFileSync(path.join(__dirname, `../../public/metadata/${tokenId}.json`), JSON.stringify(metadata));
+    try {
+      fs.writeFileSync(path.join(__dirname, `../../public/metadata/${tokenId}.json`), JSON.stringify(metadata));
+      const pathURL = `http://13.213.117.124:2202/api/v1/metadata/${tokenId}.json`;
+      console.log(pathURL)
+      return pathURL;
+    } catch (e) {
+      console.error(e);
+    }
   } catch(err) {
     throw err;
   }
