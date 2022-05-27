@@ -76,6 +76,7 @@ exports.veirfy = async (req, res) => {
       return res.status(400).send({ message: 'Signature is not valid.' });
   
     const user = await User.findOne({ wallet_address: account.toString().toLowerCase() });
+    const energy = await Energy.findOne({ user_id: user._id });
 
     if (!user)
       return res.status(404).send({ message: 'User Not found.' });
@@ -87,6 +88,8 @@ exports.veirfy = async (req, res) => {
       verified: true,
       userID: user._id,
       accessToken,
+      steps: energy.steps,
+      energyIcon: energy.energy_icon,
     });
   } catch(err) {
     console.log(err)
