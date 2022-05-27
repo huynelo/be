@@ -29,7 +29,7 @@ const sendEmail = async (data) => {
     }
   });
 
-  const templateEmailComfirmationPayment = path.join(__dirname, '../../public/templates/email-confirm-payment.html');
+  const templateEmailComfirmationPayment = path.join(__dirname, '../../files/templates/email-confirm-payment.html');
   readHTMLFile(templateEmailComfirmationPayment, async function(err, html) {
     const template = handlebars.compile(html);
     const replacements = {
