@@ -1,11 +1,13 @@
 const bcrypt = require('bcryptjs');
 
 const User = require('../models/User');
+const Energy = require('../models/Energy');
 
 exports.getUser = async (req, res) => {
   try {
     if (!req.userId) return res.status(400).send({ message: 'User ID is required.' });
     const user = await User.findOne({ id: req.userId });
+    const energy = await Energy.findOne({ user_id: user._id });
 
     if (!user)
       return res.status(404).send({ message: "User Not found." });
@@ -17,6 +19,8 @@ exports.getUser = async (req, res) => {
       wallet_address: user.wallet_address,
       wallet_balance: user.wallet_balance,
       account_balance: user.account_balance,
+      steps: energy.steps,
+      energyIcon: energy.energy_icon,
     });
   } catch (error) {
     res.status(500).send({ message: error });
